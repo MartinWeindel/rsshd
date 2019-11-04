@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rsshd
+spec:
+  selector:
+    app: rsshd
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 22
+      targetPort: 22
+      name: sshd
+    - protocol: TCP
+      port: 10000
+      targetPort: 10000
+      name: p0
+    - protocol: TCP
+      port: 10001
+      targetPort: 10001
+      name: p1
+    - protocol: TCP
+      port: 10002
+      targetPort: 10002
+      name: p2
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rsshd
+  labels:
+    app: rsshd
+spec:
+  containers:
+  - name: sshd
+    image: docker.io/mweindel/rsshd:latest
+    command: ['/usr/local/bin/sshd.sh']
+    resources:
+      limits:
+        memory: 200Mi
+      requests:
+        cpu: 50m
+        memory: 200Mi
+    ports:
+    - containerPort: 22
+      name: sshd
+    - containerPort: 10000
+      name: p0
+    - containerPort: 10001
+      name: p1
+    - containerPort: 10002
+      name: p2
