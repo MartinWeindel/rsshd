@@ -92,4 +92,17 @@ This provides complete encapsulation, at the expense of another layer of
 "jumping" whenver you need to access your servers.
 
 
+# Support for Kubernetes webhook development with local process
+
+This setup is used to locally run a server process locally providing a webhook and
+exposing it via a service in a Kubernetes cluster (`rsshd-webhook`).
+
+For this purpose ssh is used to setup a remote port forwarding.
+For example, if the server process has the port 8000,
+the startup command is 
+
+```
+kubectl port-forward svc/rsshd-ssh 10022:22 &
+ssh -p 10022 -R 10000:localhost:8000 -o ServerAliveInterval=60 root@localhost ping localhost > /dev/null
+```
 

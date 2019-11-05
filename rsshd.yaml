@@ -2,28 +2,28 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: rsshd
+  name: rsshd-ssh
+  namespace: default
 spec:
   selector:
     app: rsshd
-  type: NodePort
   ports:
     - protocol: TCP
       port: 22
-      targetPort: 22
       name: sshd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rsshd-webhook1
+  namespace: default
+spec:
+  selector:
+    app: rsshd
+  ports:
     - protocol: TCP
-      port: 10000
+      port: 443
       targetPort: 10000
-      name: p0
-    - protocol: TCP
-      port: 10001
-      targetPort: 10001
-      name: p1
-    - protocol: TCP
-      port: 10002
-      targetPort: 10002
-      name: p2
 ---
 apiVersion: v1
 kind: Pod
@@ -35,7 +35,11 @@ spec:
   containers:
   - name: sshd
     image: docker.io/mweindel/rsshd:latest
+    imagePullPolicy: Always
     command: ['/usr/local/bin/sshd.sh']
+    env:
+    - name: AUTHORIZED_KEYS
+      value: ssh-rsa XXXX
     resources:
       limits:
         memory: 200Mi
