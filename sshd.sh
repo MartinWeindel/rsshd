@@ -60,12 +60,14 @@ fi
 if [ -z "$LOCAL" -o "$LOCAL" == 0 ]; then
     sed -i "s;\GatewayPorts no;GatewayPorts yes;g" $SDIR/sshd_config
     sed -i "s;\AllowTcpForwarding no;AllowTcpForwarding yes;g" $SDIR/sshd_config
+    sed -i "s;\#PermitRootLogin .*;PermitRootLogin yes;g" $SDIR/sshd_config
 fi
-s
+
 # Fix permissions and access to the .ssh directory (in case it was shared with
 # the host)
 chown root $HOME/.ssh
 chmod 755 $HOME/.ssh
+echo 'root:*' | chpasswd -e
 
 if [ -n "$AUTHORIZED_KEYS" ]; then
   echo "$AUTHORIZED_KEYS" >  $HOME/.ssh/authorized_keys
