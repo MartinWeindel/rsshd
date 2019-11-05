@@ -1,11 +1,33 @@
 #!/bin/bash -e
 
 PUBLIC_KEY="$(cat ~/.ssh/id_rsa.pub)"
+LOCAL_SSH_PORT=10022
+SERVICE_BACKING_PORT_ON_POD=10000
+LOCAL_SERVER_PORT=8000
 
-cat rssh.yaml | sed -e "s/__AUTHORIZED_KEYS__/$PUBLIC_KEY/g" | kubectl apply -f -
+cat "$(dirname "$0")"/rsshd.yaml | sed -e "s;__AUTHORIZED_KEYS__;$PUBLIC_KEY;g" | kubectl apply -f -
 
-kubectl port-forward svc/rsshd-ssh 10022:22 &
+while [ "$(kubectl get deploy rsshd -ojsonpath="{.status.readyReplicas}")" -lt 1 ]; do
+  sleep 1
+done
 
-ssh-keygen -R '[localhost]:10022' >/dev/null
-ssh -p 10022 -R 10000:localhost:8000 -o ServerAliveInterval=60 root@localhost ping localhost > /dev/null
+trapHandler()
+{
+ if [[ -n "$PID_PORT_FORWARD" ]]; then
+    kill $PID_PORT_FORWARD
+  fi
+}
+
+trap trapHandler SIGINT SIGTERM EXIT
+
+kubectl port-forward svc/rsshd-ssh $LOCAL_SSH_PORT:22 &
+PID_PORT_FORWARD=$!
+
+ssh-keygen -R '[localhost]:10022' >/dev/null 2>&1 || true
+
+while ! nc -vz localhost $LOCAL_SSH_PORT > /dev/null 2>&1; do
+  sleep 1
+done
+
+ssh -p $LOCAL_SSH_PORT -R $SERVICE_BACKING_PORT_ON_POD:localhost:$LOCAL_SERVER_PORT -o ServerAliveInterval=60 -o StrictHostKeyChecking=accept-new root@localhost ping localhost > /dev/null
 
