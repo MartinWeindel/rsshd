@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
       - name: sshd
-        image: docker.io/mweindel/rsshd:latest
+        image: docker.io/mweindel/rsshd:0.1
         imagePullPolicy: Always
         command: ['/usr/local/bin/sshd.sh']
         env:
