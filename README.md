@@ -1,5 +1,17 @@
 # RsshD
 
+## Support for Kubernetes webhook development with local process
+
+This setup is used to locally run a server process locally providing a webhook and
+exposing it via a service in a Kubernetes cluster (`rsshd-webhook`).
+
+For this purpose ssh is used to setup a remote port forwarding.
+
+The complete local setup is condensed in `fake.sh`.
+You need to set the env variable KUBECONFIG to the destination Kubernetes cluster first.
+
+
+## Original read me
 This provides a minimal Docker container for keeping the connections to remote
 servers that are placed behind (several layers) of NATed networks. I use this to
 keep track of Raspberry Pis, "in the wild" and behind mobile connections. The
@@ -90,19 +102,4 @@ outside the container. Instead, you will have to jump in the container with
     
 This provides complete encapsulation, at the expense of another layer of
 "jumping" whenver you need to access your servers.
-
-
-# Support for Kubernetes webhook development with local process
-
-This setup is used to locally run a server process locally providing a webhook and
-exposing it via a service in a Kubernetes cluster (`rsshd-webhook`).
-
-For this purpose ssh is used to setup a remote port forwarding.
-For example, if the server process has the port 8000,
-the startup command is 
-
-```
-kubectl port-forward svc/rsshd-ssh 10022:22 &
-ssh -p 10022 -R 10000:localhost:8000 -o ServerAliveInterval=60 root@localhost ping localhost > /dev/null
-```
 
