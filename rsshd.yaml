@@ -38,7 +38,7 @@ spec:
     metadata:
       labels:
         app: rsshd
-        debug: provider-vsphere
+        debug: __DEBUG_LABEL_VALUE__
     spec:
       containers:
       - name: sshd
