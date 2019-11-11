@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rsshd-ssh
-  namespace: default
+  namespace: __NAMESPACE__
 spec:
   selector:
     app: rsshd
@@ -16,7 +16,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rsshd-webhook1
-  namespace: default
+  namespace: __NAMESPACE__
 spec:
   selector:
     app: rsshd
@@ -29,6 +29,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rsshd
+  namespace: __NAMESPACE__
 spec:
   selector:
     matchLabels:
@@ -37,6 +38,7 @@ spec:
     metadata:
       labels:
         app: rsshd
+        debug: provider-vsphere
     spec:
       containers:
       - name: sshd

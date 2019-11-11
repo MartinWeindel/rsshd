@@ -4,8 +4,9 @@ PUBLIC_KEY="$(cat ~/.ssh/id_rsa.pub)"
 LOCAL_SSH_PORT=10022
 SERVICE_BACKING_PORT_ON_POD=10000
 LOCAL_SERVER_PORT=8000
+NAMESPACE=default
 
-cat "$(dirname "$0")"/rsshd.yaml | sed -e "s;__AUTHORIZED_KEYS__;$PUBLIC_KEY;g" | kubectl apply -f -
+cat "$(dirname "$0")"/rsshd.yaml | sed -e "s;__NAMESPACE__;$NAMESPACE;g" | sed -e "s;__AUTHORIZED_KEYS__;$PUBLIC_KEY;g" | kubectl apply -f -
 
 while [ "$(kubectl get deploy rsshd -ojsonpath="{.status.readyReplicas}")" -lt 1 ]; do
   sleep 1
