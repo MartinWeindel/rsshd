@@ -6,24 +6,11 @@ metadata:
   namespace: __NAMESPACE__
 spec:
   selector:
-    app: rsshd
+    ssh-app: rsshd
   ports:
     - protocol: TCP
       port: 22
       name: sshd
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: rsshd-webhook1
-  namespace: __NAMESPACE__
-spec:
-  selector:
-    app: rsshd
-  ports:
-    - protocol: TCP
-      port: 443
-      targetPort: 10000
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,12 +20,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: rsshd
+      ssh-app: rsshd
   template:
     metadata:
       labels:
-        app: rsshd
-        debug: __DEBUG_LABEL_VALUE__
+        ssh-app: rsshd
+__LABELS__
     spec:
       containers:
       - name: sshd

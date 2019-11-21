@@ -7,9 +7,48 @@ exposing it via a service in a Kubernetes cluster (`rsshd-webhook`).
 
 For this purpose ssh is used to setup a remote port forwarding.
 
-The complete local setup is condensed in `fake.sh`.
-You need to set the env variable KUBECONFIG to the destination Kubernetes cluster first.
+The complete local setup is condensed in `bin/kfw`.
+It offers three sub commands:
+- `service`: deploys a proxy service into a kubernetes cluster and forwards
+  incoming requests to a server of localhost
 
+  Important Options:
+  - `-n <namespace>` namespace to deploy service proxy
+  - `--label <name>=<value>` labels used for service proxy pod required
+    to match selector in service object
+  - `-r <port>` service backing port opened in proxy service pod
+  - `-l <port>` port used by local server used to serve the requests
+  - `-d` delete proxy service deployment
+
+  ```Example
+  $ kfw service -n test -r 8080 -l 8000 --label service=test
+  ```
+
+- `client`: establish a port forwarding for a service usable to locally
+  call the service
+
+  Important Options:
+  - `-n <namespace>` namespace of the service object
+  - `-s <service>` service to forward to
+  - `-l <port>` local port to forward to service
+
+  ```Example
+  $ kfw client -n test -l 8080 -s test
+  ```
+
+- `server`: start a local test server for serving http requests
+
+  Important Options:
+  - `-l <port>` local port to serve requests
+
+  ```Example
+  $ kfw server -l 8080
+  ```
+
+By default for kubernetes access the environment variable `KUBECONFIG` is used.
+It can be overwritten by the option `--kubeconfig`.
+For the proxy service an sshd server pod together with reverse ssh port
+forwarding is used. By default the ssh keys are taken from the user's `.ssh` folder. They can be explicitly specified with the options `--public-key` and `--private-key`. The ssh server is used used via kubectl port forwarding. The local port can be selected using the option `--ssh-port`.
 
 ## Original read me
 This provides a minimal Docker container for keeping the connections to remote
