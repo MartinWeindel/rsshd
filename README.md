@@ -19,8 +19,9 @@ It offers three sub commands:
   - `-r <port>` service backing port opened in proxy service pod
   - `-l <port>` port used by local server used to serve the requests
   - `-d` delete proxy service deployment
-
-  ```Example
+  
+  **Example**
+  ```bash
   $ kfw service -n test -r 8080 -l 8000 --label service=test
   ```
 
@@ -32,7 +33,8 @@ It offers three sub commands:
   - `-s <service>` service to forward to
   - `-l <port>` local port to forward to service
 
-  ```Example
+  **Example**
+  ```bash
   $ kfw client -n test -l 8080 -s test
   ```
 
@@ -41,7 +43,8 @@ It offers three sub commands:
   Important Options:
   - `-l <port>` local port to serve requests
 
-  ```Example
+  **Example**
+  ```bash
   $ kfw server -l 8080
   ```
 
