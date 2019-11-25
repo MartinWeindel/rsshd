@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash -e
 
 DIR="$(dirname "$0")/.."
 
@@ -72,7 +72,14 @@ usage()
 Usage:
 Runs local webhook on remote ssh server for service
 
-./fake.sh [-d] [-n <namespace>] [--ssh-port <port>] [-r <port>] [-l <port>] [--public-key <path>]
+kfw [service|server|client] [-d] [-n <namespace>] [--ssh-port <port>] [-r <port>] [-l <port>] [--public-key <path>] [--private-key <path>] [--label <key>=<value>]
+
+Commands:
+    service                deploys a proxy service into a kubernetes cluster and forwards
+                           incoming requests to a server of localhost (default command)
+    server                 start a local test server for serving http requests
+    client                 establish a port forwarding for a service usable to locally
+                           call the service
 
 Options:
     -n <namespace>         kubernetes namespace to deploy sshd & service ($NAMESPACE)
@@ -81,11 +88,11 @@ Options:
     -l <port>              local server port ($LOCAL_SERVER_PORT)
     --label <key>=<value>  label(s) for pod ($LABELS)
     --public-key <path>    path to ssh public key ($PUBLIC_KEY_PATH)
-    --private-key <path>    path to ssh provate key ($PRIVATE_KEY_PATH)
+    --private-key <path>   path to ssh provate key ($PRIVATE_KEY_PATH)
     --kubeconfig <path>    path to kubeconfig ($KUBECONFIG)
     -d                     delete kubernetes deployment
 
-Example: bin/kfw -n extension-foo-bar 
+Example: bin/kfw service -n extension-foo-bar 
 EOM
 }
 
