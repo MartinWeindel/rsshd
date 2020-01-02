@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
+
+set -e
 
 DIR="$(dirname "$0")/.."
 
@@ -6,7 +8,7 @@ PUBLIC_KEY_PATH=~/.ssh/id_rsa.pub
 PRIVATE_KEY_PATH=~/.ssh/id_rsa
 LOCAL_SSH_PORT=10022
 
-SERVICE_BACKING_PORT_ON_POD=10000
+SERVICE_BACKING_PORT_ON_POD=8080
 LOCAL_SERVER_PORT=8000
 NAMESPACE=default
 
@@ -72,24 +74,26 @@ usage()
 Usage:
 Runs local webhook on remote ssh server for service
 
-kfw [service|server|client] [-d] [-n <namespace>] [--ssh-port <port>] [-r <port>] [-l <port>] [--public-key <path>] [--private-key <path>] [--label <key>=<value>]
+kfw [<cmd>][-d] [-n <namespace>] [--ssh-port <port>] [-s <service>[:<port>][-r <port>] [-l <port>] [--public-key -c <port> <path>]
 
 Commands:
-    service                deploys a proxy service into a kubernetes cluster and forwards
-                           incoming requests to a server of localhost (default command)
-    server                 start a local test server for serving http requests
-    client                 establish a port forwarding for a service usable to locally
-                           call the service
+    service   deploys a proxy service into a kubernetes cluster and forwards
+              incoming requests to a server of localhost (default command)
+    client    establish a port forwarding for a service usable to locally
+              call the service by a local client
+    server    start a local test server for serving http requests
 
 Options:
     -n <namespace>         kubernetes namespace to deploy sshd & service ($NAMESPACE)
     --ssh-port <port>      local ssh port ($LOCAL_SSH_PORT)
+    -s <service>[:<port>]  kuberneets service and optional port ($SERVICE:$SERVICE_PORT)
     -r <port>              service backing port on pod ($SERVICE_BACKING_PORT_ON_POD)
     -l <port>              local server port ($LOCAL_SERVER_PORT)
     --label <key>=<value>  label(s) for pod ($LABELS)
     --public-key <path>    path to ssh public key ($PUBLIC_KEY_PATH)
     --private-key <path>   path to ssh provate key ($PRIVATE_KEY_PATH)
     --kubeconfig <path>    path to kubeconfig ($KUBECONFIG)
+    -c <port>              local service port for client mode ($LOCAL_SERVICE_PORT)
     -d                     delete kubernetes deployment
 
 Example: bin/kfw service -n extension-foo-bar 
