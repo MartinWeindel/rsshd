@@ -9,7 +9,7 @@ spec:
     ssh-app: rsshd
   ports:
     - protocol: TCP
-      port: 22
+      port: 2222
       name: sshd
 ---
 apiVersion: apps/v1
@@ -29,7 +29,7 @@ __LABELS__
     spec:
       containers:
       - name: sshd
-        image: docker.io/mweindel/rsshd:0.1
+        image: docker.io/mweindel/rsshd:0.2
         imagePullPolicy: Always
         command: ['/usr/local/bin/sshd.sh']
         env:
@@ -42,11 +42,5 @@ __LABELS__
             cpu: 50m
             memory: 200Mi
         ports:
-        - containerPort: 22
+        - containerPort: 2222
           name: sshd
-        - containerPort: 10000
-          name: p0
-        - containerPort: 10001
-          name: p1
-        - containerPort: 10002
-          name: p2

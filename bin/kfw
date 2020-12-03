@@ -209,7 +209,7 @@ create()
     sleep 1
   done
 
-  kubectl -n "$NAMESPACE" port-forward svc/rsshd-ssh $LOCAL_SSH_PORT:22 &
+  kubectl -n "$NAMESPACE" port-forward svc/rsshd-ssh $LOCAL_SSH_PORT:2222 &
   PID_PORT_FORWARD=$!
 
   ssh-keygen -R '[localhost]:'$LOCAL_SSH_PORT >/dev/null 2>&1 || true
@@ -219,7 +219,7 @@ create()
   done
 
   echo "opening tunnel $SERVICE_BACKING_PORT_ON_POD:localhost:$LOCAL_SERVER_PORT"
-  ssh -i "$PRIVATE_KEY_PATH" -p $LOCAL_SSH_PORT -R $SERVICE_BACKING_PORT_ON_POD:localhost:$LOCAL_SERVER_PORT -o ServerAliveInterval=60 -o StrictHostKeyChecking=false root@localhost ping localhost > /dev/null
+  ssh -i "$PRIVATE_KEY_PATH" -p $LOCAL_SSH_PORT -R $SERVICE_BACKING_PORT_ON_POD:localhost:$LOCAL_SERVER_PORT -o ServerAliveInterval=60 -o StrictHostKeyChecking=false app@localhost watch -t date -Iseconds > /dev/null
 }
 
 service()

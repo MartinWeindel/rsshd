@@ -4,15 +4,14 @@
 # tunnels.
 
 # Settings directory
-SDIR=/etc/ssh
+SDIR="$HOME/etc/ssh"
 
-# Directory for HOSTKEYS, create if necessary
-if [ -z "$KEYS" ]; then
-    KEYS=$SDIR/keys
-fi
-if [ ! -d $KEYS ]; then
-    mkdir -p $KEYS
-fi
+mkdir -p $SDIR
+cp /etc/ssh/* $SDIR
+
+# Directory for HOSTKEYS
+KEYS=$SDIR/keys
+mkdir -p $KEYS
 
 # Generate server keys, if necessary. ssh-keygen generates the keys in the
 # default directory, not where we want the keys, so we move the keys once they
@@ -20,7 +19,7 @@ fi
 if [ ! -f "${KEYS}/ssh_host_rsa_key" ]; then
     # One shot generation, -A really is for init.d style startup script, but
     # this is what we sort of are.
-    ssh-keygen -A
+    ssh-keygen -A -f $HOME
     
     # Move the keys to the location that we want
     if [ -f "$SDIR/ssh_host_rsa_key" ]; then
@@ -39,7 +38,17 @@ if [ ! -f "${KEYS}/ssh_host_rsa_key" ]; then
         mv $SDIR/ssh_host_ed25519_key $KEYS/ssh_host_ed25519_key
         mv $SDIR/ssh_host_ed25519_key.pub $KEYS/ssh_host_ed25519_key.pub
     fi
+
 fi
+
+# add hostkey to config as we using custom configuration
+cat >> $SDIR/sshd_config << EOM
+
+Port 2222
+HostKey $KEYS/ssh_host_rsa_key
+HostKey $KEYS/ssh_host_ecdsa_key
+HostKey $KEYS/ssh_host_ed25519_key
+EOM
 
 # Arrange for the config to point at the proper server keys, i.e. at the proper
 # location
@@ -63,11 +72,9 @@ if [ -z "$LOCAL" -o "$LOCAL" == 0 ]; then
     sed -i "s;\#PermitRootLogin .*;PermitRootLogin yes;g" $SDIR/sshd_config
 fi
 
-# Fix permissions and access to the .ssh directory (in case it was shared with
-# the host)
-chown root $HOME/.ssh
+mkdir "$HOME/.ssh"
+chown app:app $HOME/.ssh
 chmod 755 $HOME/.ssh
-echo 'root:*' | chpasswd -e
 
 if [ -n "$AUTHORIZED_KEYS" ]; then
   echo "$AUTHORIZED_KEYS" >  $HOME/.ssh/authorized_keys
